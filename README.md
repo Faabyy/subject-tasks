@@ -1,92 +1,130 @@
-# Obsidian Sample Plugin
+# Subject tasks
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+An [Obsidian](https://obsidian.md) plugin that shows the open tasks of your whole vault in one sidebar view, grouped by subject folder and sorted by due date.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+I keep my school notes in one folder per subject, and my open tasks (`- [ ]`) end up scattered over dozens of notes. This plugin collects them in one place, so I can see what is due without opening every note.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+> **Status: work in progress (version 0.1.0, not released yet).**
+> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, and the commands below.
+> Not built yet: ticking a task from the view (the plugin currently never changes your notes), and a full settings screen (see [Settings](#settings)).
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+## What it does
 
-## First time developing plugins?
+- **One list for the whole vault.** Open the view from the command palette and see every open task.
+- **Grouped by subject.** A subject is the first folder below a root folder you choose. With no root folder set, it is the first folder in the note's path.
+- **Sorted by urgency.** Overdue tasks come first, then tasks by due date (today included), then tasks without a date.
+- **Overdue tasks stand out.** They get the CSS class `is-overdue` and a red date.
+- **Click to jump.** Clicking a task opens its note with the cursor on that line. Hold <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> or middle-click to open it in a new tab. If the note changed in the meantime, the plugin looks for the task's line instead of trusting the old line number.
+- **Filters.** Search by words (all words must match the task text or the note path) and an "Overdue only" switch.
+- **Always up to date.** Editing, renaming or deleting notes updates the list within a moment.
 
-Quick starting guide for new plugin devs:
+## Commands
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+| Command | What it does |
+| --- | --- |
+| Open view | Shows the task list in the right sidebar. |
+| Refresh task index | Reads the vault again and shows how many tasks were found and how long it took. Normally not needed. |
 
-## Releasing new releases
+The plugin sets no default hotkeys. You can assign your own under *Settings → Hotkeys*.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+## How tasks are recognized
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+A task is a Markdown list item with a checkbox. Obsidian decides what counts as a task (this plugin asks Obsidian's own metadata cache), and the plugin then reads the details from that line.
 
-## Adding your plugin to the community plugin list
+| Written as | Recognized |
+| --- | --- |
+| `- [ ] text`, `* [ ] text`, `+ [ ] text` | yes |
+| `1. [ ] text`, `1) [ ] text` | yes |
+| Tasks nested in other lists | yes |
+| Tasks inside quotes and callouts (`> - [ ] text`) | yes |
+| `[x]` or `[X]` | done |
+| Other characters, such as `[/]` or `[-]` | custom status |
+| Inside code blocks or frontmatter | no |
+| An empty `- [ ]` with no text, or `- [ ]text` | no (Obsidian does not treat these as tasks either) |
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+**Due date.** Write `📅 2026-10-20` anywhere in the task, the same format the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin uses.
 
-## How to use
+- The date must be real: `2026-02-30` is ignored and stays visible in the task text, so you can spot the typo.
+- With several `📅` dates in one task, the last valid one counts.
+- Other date formats and other emoji (such as ⏳ or ✅) are not read.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+By default only open tasks are shown. Done tasks and tasks with a custom status appear only with the *Show completed tasks* option.
 
-## Manually installing the plugin
+## Settings
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| Root folder | empty (whole vault) | The folder whose subfolders are the subjects. |
+| Excluded folders | none | Notes in these folders are ignored. |
+| Show completed tasks | off | Also list done tasks and tasks with a custom status. |
 
-## Improve code quality with eslint
+At the moment the settings screen offers only the root folder. *Excluded folders* and *Show completed tasks* are already stored in the plugin's `data.json` but get their settings controls in a later version.
 
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+## Installation
 
-## Funding URL
+The plugin is not in the community plugin directory yet. To try it, build it yourself:
 
-You can include funding URLs where people who use your plugin can financially support it.
+1. Close Obsidian's restricted mode (*Settings → Community plugins*).
+2. Clone this repository into `<your vault>/.obsidian/plugins/subject-tasks`. The folder name must be `subject-tasks`.
+3. Run `npm install` and `npm run build` in that folder.
+4. Enable *Subject tasks* under *Settings → Community plugins*.
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+It needs Obsidian **1.7.2** or newer. It uses no Node or Electron APIs and is built to work on mobile, but I have not tested it there yet.
 
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
+Try it in a separate test vault first, not in your real notes. The folder `test-vault-samples/` contains invented notes with the edge cases this plugin handles.
+
+## Why another task plugin?
+
+There are good task plugins already. If you want a lot of features, use one of them:
+
+- [Taskgregator](https://community.obsidian.md/plugins/taskgregator) is a full task dashboard with priorities, smart lists and editing.
+- [Sidebar Task Hub](https://github.com/kamil-bartczak/obsidian-sidebar-task-hub) lists tasks in the sidebar, grouped by folder, file and heading.
+- [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) can group by the top-level folder with `group by root`, but only inside query blocks in a note, not in a sidebar.
+
+This plugin is deliberately small:
+
+1. **School-shaped.** The subject is simply the first folder, with no setup beyond an optional root folder.
+2. **One fixed order.** Overdue, then by date, then undated. There is nothing to configure or query.
+3. **Notes stay the only source of truth.** There are no priorities, no recurring tasks, no query language, no database, no sync and no network access.
+4. **Minimal changes to your notes.** The only thing it will ever write is the checkbox.
+5. **Code you can read.** The parser and the sorting are plain functions with unit tests and no Obsidian dependency.
+
+This comparison is based on the other plugins' documentation pages, not on long-term use. Details may have changed.
+
+## Development
+
+Node.js 20.19 or newer is recommended (a lint dependency asks for it). Build and tests also ran on Node 18.
+
+```
+npm install
+npm run dev     # builds main.js and rebuilds on every change
+npm run build   # type check and production build
+npm test        # unit tests (Vitest)
+npm run lint    # ESLint with the Obsidian plugin rules
 ```
 
-If you have multiple URLs, you can also do:
+For quick reloads in a test vault, install the [Hot Reload](https://github.com/pjeby/hot-reload) plugin and add an empty file named `.hotreload` to the plugin folder.
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
+Project layout:
+
+```
+src/
+  main.ts            wiring only: settings, commands, view registration
+  parser/            task lines to tasks (pure functions, unit tested)
+  model/             subjects, sorting, grouping, filtering (pure, unit tested)
+  vault/taskIndex.ts keeps all tasks in memory and follows vault changes
+  view/              the sidebar view
+  settings/          settings and the settings tab
+scripts/             generate a large fake vault, measure parsing outside Obsidian
+test-vault-samples/  invented notes for trying the plugin in a test vault
 ```
 
-## API Documentation
+Reading the whole vault is fast: in a generated vault of 2000 notes (about 5500 tasks), *Refresh task index* takes around 20 ms in Obsidian on a desktop PC. Generate your own with `node scripts/generate-vault.mjs <empty folder> 2000`.
 
-See https://docs.obsidian.md
+## Privacy
+
+Subject tasks reads the Markdown notes in your vault to find tasks. It makes no network requests, collects no data, and keeps nothing outside your vault except its own settings file.
+
+## License
+
+See [LICENSE](LICENSE).
