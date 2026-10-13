@@ -47,14 +47,27 @@
 }
 
 .tasks-by-folder-item {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-2);
 	padding: var(--size-2-2) var(--size-4-2);
 	border-radius: var(--radius-s);
-	cursor: pointer;
 }
 
 .tasks-by-folder-item:hover,
-.tasks-by-folder-item:focus-visible {
+.tasks-by-folder-item:focus-within {
 	background-color: var(--background-modifier-hover);
+}
+
+.tasks-by-folder-item-check {
+	flex: none;
+	margin-top: var(--size-2-1);
+}
+
+.tasks-by-folder-item-main {
+	flex: 1;
+	min-width: 0;
+	cursor: pointer;
 }
 
 .tasks-by-folder-item-text {

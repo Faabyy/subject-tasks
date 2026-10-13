@@ -8,8 +8,17 @@ import { isOverdue } from '../model/sortTasks';
 import type { VaultTask } from '../model/types';
 import type { TasksByFolderSettings } from '../settings/settings';
 import type { TaskIndex } from '../vault/taskIndex';
+import { toggleTaskInFile } from '../vault/toggleTaskInFile';
+import type { ToggleOutcome } from '../vault/toggleTaskInFile';
 
 export const VIEW_TYPE_TASKS_BY_FOLDER = 'tasks-by-folder-view';
+
+/** Shown when a task could not be ticked. Nothing was written to the note in any of these cases. */
+const REFUSAL_MESSAGES: Record<Extract<ToggleOutcome, { ok: false }>['reason'], string> = {
+	changed: 'The note has changed since the list was drawn, so nothing was written. The list is updating.',
+	'unsupported-status': 'This task has a custom status and cannot be ticked from the list.',
+	'missing-note': 'Could not find the note of this task.',
+};
 
 /** Wait this long after the last keystroke before the list is redrawn. */
 const SEARCH_DELAY_MS = 150;
@@ -82,7 +91,10 @@ export class TasksByFolderView extends ItemView {
 		this.registerDomEvent(this.listEl, 'click', (evt) => this.onRowActivated(evt));
 		this.registerDomEvent(this.listEl, 'auxclick', (evt) => this.onRowActivated(evt));
 		this.registerDomEvent(this.listEl, 'keydown', (evt) => {
-			if (evt.key === 'Enter' || evt.key === ' ') {
+			// The checkbox handles Space itself and then sends a click. Only the task text needs this.
+			const node = evt.targetNode;
+			const onText = !!node?.instanceOf(HTMLElement) && node.hasClass('tasks-by-folder-item-main');
+			if (onText && (evt.key === 'Enter' || evt.key === ' ')) {
 				evt.preventDefault();
 				this.onRowActivated(evt);
 			}
@@ -129,16 +141,30 @@ export class TasksByFolderView extends ItemView {
 	private renderRow(parent: HTMLElement, task: VaultTask, today: string): void {
 		const overdue = isOverdue(task, today);
 
-		const row = parent.createDiv({
-			cls: 'tasks-by-folder-item',
-			attr: { role: 'button', tabindex: '0' },
-		});
+		const row = parent.createDiv({ cls: 'tasks-by-folder-item' });
 		row.toggleClass('is-overdue', overdue);
 		row.toggleClass('is-done', task.status !== 'open');
 
-		row.createDiv({ cls: 'tasks-by-folder-item-text', text: task.text === '' ? '(empty task)' : task.text });
+		// Open and done tasks can be ticked. A custom status such as [/] is shown but left alone.
+		const checkbox = row.createEl('input', {
+			cls: 'tasks-by-folder-item-check',
+			attr: { type: 'checkbox', 'aria-label': 'Mark task as done' },
+		});
+		checkbox.checked = task.status === 'done';
+		if (task.status === 'other') {
+			checkbox.indeterminate = true;
+			checkbox.disabled = true;
+		}
 
-		const meta = row.createDiv({ cls: 'tasks-by-folder-item-meta' });
+		// The text and the line below it open the note.
+		const main = row.createDiv({
+			cls: 'tasks-by-folder-item-main',
+			attr: { role: 'button', tabindex: '0' },
+		});
+
+		main.createDiv({ cls: 'tasks-by-folder-item-text', text: task.text === '' ? '(empty task)' : task.text });
+
+		const meta = main.createDiv({ cls: 'tasks-by-folder-item-meta' });
 		if (task.due !== null) {
 			meta.createSpan({ cls: 'tasks-by-folder-item-due', text: task.due });
 		}
@@ -149,16 +175,44 @@ export class TasksByFolderView extends ItemView {
 
 	private onRowActivated(evt: MouseEvent | KeyboardEvent): void {
 		// A plain click is `click`; a middle click arrives as `auxclick` with button 1. Ignore the right button.
-		if (evt instanceof MouseEvent && evt.type === 'auxclick' && evt.button !== 1) return;
+		if (evt.instanceOf(MouseEvent) && evt.type === 'auxclick' && evt.button !== 1) return;
 
-		const target = evt.target;
-		if (!(target instanceof HTMLElement)) return;
+		const target = evt.targetNode;
+		if (!target?.instanceOf(HTMLElement)) return;
 
 		const row = target.closest<HTMLElement>('.tasks-by-folder-item');
 		const task = row ? this.taskByRow.get(row) : undefined;
 		if (!task) return;
 
-		void this.openTask(task, evt);
+		if (target.instanceOf(HTMLInputElement) && target.hasClass('tasks-by-folder-item-check')) {
+			// Only a plain click ticks; a middle click on the box does nothing.
+			if (evt.type === 'click') void this.toggleTask(task, target);
+			return;
+		}
+
+		if (target.closest('.tasks-by-folder-item-main')) void this.openTask(task, evt);
+	}
+
+	/**
+	 * Ticks or unticks the task in its note. The box has already flipped on screen;
+	 * if the note refuses or the write fails, the list is drawn again to undo that.
+	 * On success the list updates itself when the note's change comes back through the index.
+	 */
+	private async toggleTask(task: VaultTask, checkbox: HTMLInputElement): Promise<void> {
+		// Blocks a second click until the list has redrawn, so one task is never toggled twice from stale data.
+		checkbox.disabled = true;
+
+		try {
+			const outcome = await toggleTaskInFile(this.app, task);
+			if (!outcome.ok) {
+				new Notice(REFUSAL_MESSAGES[outcome.reason]);
+				this.renderList();
+			}
+		} catch (error) {
+			console.error('Tasks by folder: could not update the task', error);
+			new Notice('Could not update the task. Details are in the developer console.');
+			this.renderList();
+		}
 	}
 
 	/** Opens the note and puts the cursor on the task. Ctrl or Cmd (or a middle click) opens a new tab. */

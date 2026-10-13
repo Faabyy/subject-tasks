@@ -5,8 +5,8 @@ An [Obsidian](https://obsidian.md) plugin that shows the open tasks of your whol
 Open tasks (`- [ ]`) tend to end up scattered over dozens of notes. This plugin collects them in one place, grouped by the folder they live in, so you can see what is due without opening every note. I first built it for my school notes, with one folder per subject. It works for any folder structure: courses, projects, clients, areas of life.
 
 > **Status: work in progress (version 0.1.0, not released yet).**
-> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, and the commands below.
-> Not built yet: ticking a task from the view (the plugin currently never changes your notes), and a full settings screen (see [Settings](#settings)).
+> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, ticking tasks, and the commands below.
+> Not built yet: a full settings screen (see [Settings](#settings)).
 
 <p align="center">
   <img src="docs/view.png" width="280" alt="The Tasks by folder sidebar view: tasks grouped by folder (Archiv, Deutsch, Englisch, Informatik, Mathe), each with its due date and note name, an overdue date in red, a search field and an Overdue only switch.">
@@ -19,8 +19,18 @@ Open tasks (`- [ ]`) tend to end up scattered over dozens of notes. This plugin 
 - **Sorted by urgency.** Overdue tasks come first, then tasks by due date (today included), then tasks without a date.
 - **Overdue tasks stand out.** They get the CSS class `is-overdue` and a red date.
 - **Click to jump.** Clicking a task opens its note with the cursor on that line. Hold <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> or middle-click to open it in a new tab. If the note changed in the meantime, the plugin looks for the task's line instead of trusting the old line number.
+- **Tick tasks from the list.** Click the checkbox to mark a task done or open again. The plugin changes only the character between the brackets (`[ ]` and `[x]`) and writes nothing if the note has changed since the list was drawn (see [Safety when ticking](#safety-when-ticking)).
 - **Filters.** Search by words (all words must match the task text or the note path) and an "Overdue only" switch.
 - **Always up to date.** Editing, renaming or deleting notes updates the list within a moment.
+
+## Safety when ticking
+
+Ticking a task is the only thing this plugin ever writes to your notes. To keep it safe:
+
+- Only the character inside the brackets changes. The rest of the line, all other lines and the line endings stay exactly as they were.
+- The check and the write happen in one step (`Vault.process`). The line must still be exactly the line the list showed, at the same position. If you edited the note, or lines moved, in the meantime, nothing is written and you get a notice. Tick again once the list has updated.
+- Tasks with a custom status such as `[/]` or `[-]` are shown, but their checkbox is disabled. Only open and done tasks can be ticked.
+- No completion date is added.
 
 ## Commands
 
@@ -90,7 +100,7 @@ This plugin is deliberately small:
 1. **Folder-shaped.** The group is simply the first folder, with no setup beyond an optional root folder.
 2. **One fixed order.** Overdue, then by date, then undated. There is nothing to configure or query.
 3. **Notes stay the only source of truth.** There are no priorities, no recurring tasks, no query language, no database, no sync and no network access.
-4. **Minimal changes to your notes.** The only thing it will ever write is the checkbox.
+4. **Minimal changes to your notes.** The only thing it writes is the checkbox, and only if the line is unchanged.
 5. **Code you can read.** The parser and the sorting are plain functions with unit tests and no Obsidian dependency.
 
 This comparison is based on the other plugins' documentation pages, not on long-term use. Details may have changed.
