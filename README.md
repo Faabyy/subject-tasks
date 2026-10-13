@@ -8,6 +8,10 @@ I keep my school notes in one folder per subject, and my open tasks (`- [ ]`) en
 > Working today: the sidebar view, grouping, sorting, filters, jumping to the task, and the commands below.
 > Not built yet: ticking a task from the view (the plugin currently never changes your notes), and a full settings screen (see [Settings](#settings)).
 
+<p align="center">
+  <img src="docs/view.png" width="280" alt="The Subject tasks sidebar view: tasks grouped by subject (Archiv, Deutsch, Englisch, Informatik, Mathe), each with its due date and note name, an overdue date in red, a search field and an Overdue only switch.">
+</p>
+
 ## What it does
 
 - **One list for the whole vault.** Open the view from the command palette and see every open task.
