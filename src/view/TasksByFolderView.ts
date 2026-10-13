@@ -2,14 +2,14 @@ import { ItemView, Keymap, MarkdownView, Notice, debounce } from 'obsidian';
 import type { WorkspaceLeaf } from 'obsidian';
 import { toDateString } from '../model/dates';
 import { filterTasks } from '../model/filterTasks';
-import { groupBySubject } from '../model/groupBySubject';
+import { groupByFolder } from '../model/groupByFolder';
 import { locateLine } from '../model/locateLine';
 import { isOverdue } from '../model/sortTasks';
 import type { VaultTask } from '../model/types';
-import type { SubjectTasksSettings } from '../settings/settings';
+import type { TasksByFolderSettings } from '../settings/settings';
 import type { TaskIndex } from '../vault/taskIndex';
 
-export const VIEW_TYPE_SUBJECT_TASKS = 'subject-tasks-view';
+export const VIEW_TYPE_TASKS_BY_FOLDER = 'tasks-by-folder-view';
 
 /** Wait this long after the last keystroke before the list is redrawn. */
 const SEARCH_DELAY_MS = 150;
@@ -20,10 +20,10 @@ function noteName(path: string): string {
 	return file.endsWith('.md') ? file.slice(0, -3) : file;
 }
 
-/** Sidebar view that lists the open tasks of the vault, grouped by subject. */
-export class SubjectTasksView extends ItemView {
+/** Sidebar view that lists the open tasks of the vault, grouped by folder. */
+export class TasksByFolderView extends ItemView {
 	private readonly index: TaskIndex;
-	private readonly getSettings: () => SubjectTasksSettings;
+	private readonly getSettings: () => TasksByFolderSettings;
 
 	private query = '';
 	private onlyOverdue = false;
@@ -34,18 +34,18 @@ export class SubjectTasksView extends ItemView {
 
 	private readonly renderSoon = debounce(() => this.renderList(), SEARCH_DELAY_MS, true);
 
-	constructor(leaf: WorkspaceLeaf, index: TaskIndex, getSettings: () => SubjectTasksSettings) {
+	constructor(leaf: WorkspaceLeaf, index: TaskIndex, getSettings: () => TasksByFolderSettings) {
 		super(leaf);
 		this.index = index;
 		this.getSettings = getSettings;
 	}
 
 	getViewType(): string {
-		return VIEW_TYPE_SUBJECT_TASKS;
+		return VIEW_TYPE_TASKS_BY_FOLDER;
 	}
 
 	getDisplayText(): string {
-		return 'Subject tasks';
+		return 'Tasks by folder';
 	}
 
 	getIcon(): string {
@@ -55,12 +55,12 @@ export class SubjectTasksView extends ItemView {
 	async onOpen(): Promise<void> {
 		const root = this.contentEl;
 		root.empty();
-		root.addClass('subject-tasks-view');
+		root.addClass('tasks-by-folder-view');
 
-		const controls = root.createDiv({ cls: 'subject-tasks-controls' });
+		const controls = root.createDiv({ cls: 'tasks-by-folder-controls' });
 
 		const search = controls.createEl('input', {
-			cls: 'subject-tasks-search',
+			cls: 'tasks-by-folder-search',
 			attr: { type: 'search', placeholder: 'Search tasks', 'aria-label': 'Search tasks' },
 		});
 		this.registerDomEvent(search, 'input', () => {
@@ -68,7 +68,7 @@ export class SubjectTasksView extends ItemView {
 			this.renderSoon();
 		});
 
-		const toggle = controls.createEl('label', { cls: 'subject-tasks-toggle' });
+		const toggle = controls.createEl('label', { cls: 'tasks-by-folder-toggle' });
 		const overdueBox = toggle.createEl('input', { attr: { type: 'checkbox' } });
 		toggle.createSpan({ text: 'Overdue only' });
 		this.registerDomEvent(overdueBox, 'change', () => {
@@ -76,7 +76,7 @@ export class SubjectTasksView extends ItemView {
 			this.renderList();
 		});
 
-		this.listEl = root.createDiv({ cls: 'subject-tasks-list' });
+		this.listEl = root.createDiv({ cls: 'tasks-by-folder-list' });
 
 		// One listener for all rows. Adding one per row would pile up with every redraw.
 		this.registerDomEvent(this.listEl, 'click', (evt) => this.onRowActivated(evt));
@@ -107,18 +107,18 @@ export class SubjectTasksView extends ItemView {
 		if (tasks.length === 0) {
 			const filtered = this.query.trim() !== '' || this.onlyOverdue;
 			this.listEl.createDiv({
-				cls: 'subject-tasks-empty',
+				cls: 'tasks-by-folder-empty',
 				text: filtered ? 'No tasks match the filter.' : 'No open tasks.',
 			});
 			return;
 		}
 
-		for (const group of groupBySubject(tasks, today)) {
-			const groupEl = this.listEl.createDiv({ cls: 'subject-tasks-group' });
+		for (const group of groupByFolder(tasks, today)) {
+			const groupEl = this.listEl.createDiv({ cls: 'tasks-by-folder-group' });
 
-			const header = groupEl.createDiv({ cls: 'subject-tasks-group-header' });
-			header.createSpan({ cls: 'subject-tasks-group-name', text: group.subject === '' ? 'No subject' : group.subject });
-			header.createSpan({ cls: 'subject-tasks-group-count', text: String(group.tasks.length) });
+			const header = groupEl.createDiv({ cls: 'tasks-by-folder-group-header' });
+			header.createSpan({ cls: 'tasks-by-folder-group-name', text: group.folder === '' ? 'No folder' : group.folder });
+			header.createSpan({ cls: 'tasks-by-folder-group-count', text: String(group.tasks.length) });
 
 			for (const task of group.tasks) {
 				this.renderRow(groupEl, task, today);
@@ -130,19 +130,19 @@ export class SubjectTasksView extends ItemView {
 		const overdue = isOverdue(task, today);
 
 		const row = parent.createDiv({
-			cls: 'subject-tasks-item',
+			cls: 'tasks-by-folder-item',
 			attr: { role: 'button', tabindex: '0' },
 		});
 		row.toggleClass('is-overdue', overdue);
 		row.toggleClass('is-done', task.status !== 'open');
 
-		row.createDiv({ cls: 'subject-tasks-item-text', text: task.text === '' ? '(empty task)' : task.text });
+		row.createDiv({ cls: 'tasks-by-folder-item-text', text: task.text === '' ? '(empty task)' : task.text });
 
-		const meta = row.createDiv({ cls: 'subject-tasks-item-meta' });
+		const meta = row.createDiv({ cls: 'tasks-by-folder-item-meta' });
 		if (task.due !== null) {
-			meta.createSpan({ cls: 'subject-tasks-item-due', text: task.due });
+			meta.createSpan({ cls: 'tasks-by-folder-item-due', text: task.due });
 		}
-		meta.createSpan({ cls: 'subject-tasks-item-note', text: noteName(task.path) });
+		meta.createSpan({ cls: 'tasks-by-folder-item-note', text: noteName(task.path) });
 
 		this.taskByRow.set(row, task);
 	}
@@ -154,7 +154,7 @@ export class SubjectTasksView extends ItemView {
 		const target = evt.target;
 		if (!(target instanceof HTMLElement)) return;
 
-		const row = target.closest<HTMLElement>('.subject-tasks-item');
+		const row = target.closest<HTMLElement>('.tasks-by-folder-item');
 		const task = row ? this.taskByRow.get(row) : undefined;
 		if (!task) return;
 

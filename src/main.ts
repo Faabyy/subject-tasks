@@ -1,23 +1,23 @@
 import { Notice, Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, SubjectTasksSettings } from './settings/settings';
-import { SubjectTasksSettingTab } from './settings/SubjectTasksSettingTab';
+import { DEFAULT_SETTINGS, TasksByFolderSettings } from './settings/settings';
+import { TasksByFolderSettingTab } from './settings/TasksByFolderSettingTab';
 import { TaskIndex } from './vault/taskIndex';
-import { SubjectTasksView, VIEW_TYPE_SUBJECT_TASKS } from './view/SubjectTasksView';
+import { TasksByFolderView, VIEW_TYPE_TASKS_BY_FOLDER } from './view/TasksByFolderView';
 
-export default class SubjectTasksPlugin extends Plugin {
-	settings!: SubjectTasksSettings;
+export default class TasksByFolderPlugin extends Plugin {
+	settings!: TasksByFolderSettings;
 	index!: TaskIndex;
 
 	async onload() {
 		await this.loadSettings();
-		this.addSettingTab(new SubjectTasksSettingTab(this.app, this));
+		this.addSettingTab(new TasksByFolderSettingTab(this.app, this));
 
 		this.index = new TaskIndex(this, () => this.settings);
 		this.index.start();
 
 		this.registerView(
-			VIEW_TYPE_SUBJECT_TASKS,
-			(leaf) => new SubjectTasksView(leaf, this.index, () => this.settings),
+			VIEW_TYPE_TASKS_BY_FOLDER,
+			(leaf) => new TasksByFolderView(leaf, this.index, () => this.settings),
 		);
 
 		this.addCommand({
@@ -39,7 +39,7 @@ export default class SubjectTasksPlugin extends Plugin {
 
 	/** Shows the view in the right sidebar, or brings it to the front if it is already open. */
 	private async openView() {
-		await this.app.workspace.ensureSideLeaf(VIEW_TYPE_SUBJECT_TASKS, 'right', {
+		await this.app.workspace.ensureSideLeaf(VIEW_TYPE_TASKS_BY_FOLDER, 'right', {
 			active: true,
 			reveal: true,
 		});
@@ -56,7 +56,7 @@ export default class SubjectTasksPlugin extends Plugin {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<SubjectTasksSettings>,
+			(await this.loadData()) as Partial<TasksByFolderSettings>,
 		);
 	}
 

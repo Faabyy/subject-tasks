@@ -1,7 +1,7 @@
 {
-	"name": "subject-tasks",
+	"name": "tasks-by-folder",
 	"version": "0.1.0",
-	"description": "Obsidian plugin that lists open tasks grouped by subject folder",
+	"description": "Obsidian plugin that lists open tasks grouped by folder",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

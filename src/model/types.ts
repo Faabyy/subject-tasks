@@ -4,6 +4,6 @@ import type { ParsedTask } from '../parser/taskParser';
 export interface VaultTask extends ParsedTask {
 	/** Vault path of the note, for example `School/Math/Algebra.md`. */
 	path: string;
-	/** Subject folder name. Empty if the note is not inside a subject folder. */
-	subject: string;
+	/** Group folder: the first folder below the root folder. Empty if the note is not inside one. */
+	folder: string;
 }

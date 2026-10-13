@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSubject, isExcluded, trimSlashes } from './subject';
+import { getFolder, isExcluded, trimSlashes } from './folder';
 
 describe('trimSlashes', () => {
 	it.each([
@@ -14,52 +14,52 @@ describe('trimSlashes', () => {
 	});
 });
 
-describe('getSubject: whole vault as root', () => {
+describe('getFolder: whole vault as root', () => {
 	it('uses the first folder', () => {
-		expect(getSubject('Math/Algebra.md', '')).toBe('Math');
+		expect(getFolder('Math/Algebra.md', '')).toBe('Math');
 	});
 
 	it('uses only the first folder for deeper paths', () => {
-		expect(getSubject('Math/Algebra/Week 1/Notes.md', '')).toBe('Math');
+		expect(getFolder('Math/Algebra/Week 1/Notes.md', '')).toBe('Math');
 	});
 
-	it('returns an empty subject for a note in the vault root', () => {
-		expect(getSubject('Inbox.md', '')).toBe('');
+	it('returns an empty group for a note in the vault root', () => {
+		expect(getFolder('Inbox.md', '')).toBe('');
 	});
 
 	it('keeps spaces and umlauts in the folder name', () => {
-		expect(getSubject('Politik und Wirtschaft/Übung.md', '')).toBe('Politik und Wirtschaft');
+		expect(getFolder('Politik und Wirtschaft/Übung.md', '')).toBe('Politik und Wirtschaft');
 	});
 });
 
-describe('getSubject: with a root folder', () => {
+describe('getFolder: with a root folder', () => {
 	it('uses the first folder below the root', () => {
-		expect(getSubject('School/Math/Algebra.md', 'School')).toBe('Math');
+		expect(getFolder('School/Math/Algebra.md', 'School')).toBe('Math');
 	});
 
 	it('works with a nested root folder', () => {
-		expect(getSubject('Stuff/School/Math/Algebra.md', 'Stuff/School')).toBe('Math');
+		expect(getFolder('Stuff/School/Math/Algebra.md', 'Stuff/School')).toBe('Math');
 	});
 
-	it('returns an empty subject for a note directly in the root', () => {
-		expect(getSubject('School/Overview.md', 'School')).toBe('');
+	it('returns an empty group for a note directly in the root', () => {
+		expect(getFolder('School/Overview.md', 'School')).toBe('');
 	});
 
 	it('returns null outside the root', () => {
-		expect(getSubject('Private/Diary.md', 'School')).toBeNull();
-		expect(getSubject('Inbox.md', 'School')).toBeNull();
+		expect(getFolder('Private/Diary.md', 'School')).toBeNull();
+		expect(getFolder('Inbox.md', 'School')).toBeNull();
 	});
 
 	it('does not match a folder that only starts with the root name', () => {
-		expect(getSubject('SchoolArchive/Math/Algebra.md', 'School')).toBeNull();
+		expect(getFolder('SchoolArchive/Math/Algebra.md', 'School')).toBeNull();
 	});
 
 	it('is case sensitive like vault paths', () => {
-		expect(getSubject('school/Math/Algebra.md', 'School')).toBeNull();
+		expect(getFolder('school/Math/Algebra.md', 'School')).toBeNull();
 	});
 
 	it('ignores slashes around the root folder setting', () => {
-		expect(getSubject('School/Math/Algebra.md', '/School/')).toBe('Math');
+		expect(getFolder('School/Math/Algebra.md', '/School/')).toBe('Math');
 	});
 });
 

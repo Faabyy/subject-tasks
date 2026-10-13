@@ -1,19 +1,19 @@
-.subject-tasks-view {
+.tasks-by-folder-view {
 	padding: var(--size-4-2);
 }
 
-.subject-tasks-controls {
+.tasks-by-folder-controls {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-4-2);
 	margin-bottom: var(--size-4-3);
 }
 
-.subject-tasks-search {
+.tasks-by-folder-search {
 	width: 100%;
 }
 
-.subject-tasks-toggle {
+.tasks-by-folder-toggle {
 	display: flex;
 	align-items: center;
 	gap: var(--size-4-2);
@@ -21,16 +21,16 @@
 	font-size: var(--font-ui-small);
 }
 
-.subject-tasks-empty {
+.tasks-by-folder-empty {
 	color: var(--text-faint);
 	padding: var(--size-4-2);
 }
 
-.subject-tasks-group {
+.tasks-by-folder-group {
 	margin-bottom: var(--size-4-4);
 }
 
-.subject-tasks-group-header {
+.tasks-by-folder-group-header {
 	display: flex;
 	align-items: baseline;
 	justify-content: space-between;
@@ -40,41 +40,41 @@
 	font-weight: var(--font-semibold);
 }
 
-.subject-tasks-group-count {
+.tasks-by-folder-group-count {
 	color: var(--text-faint);
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-normal);
 }
 
-.subject-tasks-item {
+.tasks-by-folder-item {
 	padding: var(--size-2-2) var(--size-4-2);
 	border-radius: var(--radius-s);
 	cursor: pointer;
 }
 
-.subject-tasks-item:hover,
-.subject-tasks-item:focus-visible {
+.tasks-by-folder-item:hover,
+.tasks-by-folder-item:focus-visible {
 	background-color: var(--background-modifier-hover);
 }
 
-.subject-tasks-item-text {
+.tasks-by-folder-item-text {
 	color: var(--text-normal);
 	overflow-wrap: anywhere;
 }
 
-.subject-tasks-item-meta {
+.tasks-by-folder-item-meta {
 	display: flex;
 	gap: var(--size-4-2);
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-.subject-tasks-item.is-overdue .subject-tasks-item-due {
+.tasks-by-folder-item.is-overdue .tasks-by-folder-item-due {
 	color: var(--text-error);
 	font-weight: var(--font-semibold);
 }
 
-.subject-tasks-item.is-done .subject-tasks-item-text {
+.tasks-by-folder-item.is-done .tasks-by-folder-item-text {
 	color: var(--text-faint);
 	text-decoration: line-through;
 }

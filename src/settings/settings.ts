@@ -1,5 +1,5 @@
-export interface SubjectTasksSettings {
-	/** Folder whose direct subfolders count as subjects. Empty means the whole vault. */
+export interface TasksByFolderSettings {
+	/** Folder whose direct subfolders are the groups. Empty means the whole vault. */
 	rootFolder: string;
 	/** Folders whose notes are ignored. */
 	excludedFolders: string[];
@@ -7,7 +7,7 @@ export interface SubjectTasksSettings {
 	showCompleted: boolean;
 }
 
-export const DEFAULT_SETTINGS: SubjectTasksSettings = {
+export const DEFAULT_SETTINGS: TasksByFolderSettings = {
 	rootFolder: '',
 	excludedFolders: [],
 	showCompleted: false,

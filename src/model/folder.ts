@@ -1,5 +1,5 @@
 /**
- * Maps note paths to subjects. Pure functions, no Obsidian imports.
+ * Maps note paths to group folders. Pure functions, no Obsidian imports.
  * Paths are vault paths with `/` as separator, as Obsidian uses them.
  */
 
@@ -21,12 +21,12 @@ export function isExcluded(path: string, excludedFolders: readonly string[]): bo
 }
 
 /**
- * The subject is the first folder below the root folder.
+ * The group folder is the first folder below the root folder.
  *
- * - `null`: the note is outside the root folder and not part of any subject.
- * - `''`: the note is inside the root folder but not inside a subject folder.
+ * - `null`: the note is outside the root folder and belongs to no group.
+ * - `''`: the note is inside the root folder but not inside a subfolder of it.
  */
-export function getSubject(path: string, rootFolder: string): string | null {
+export function getFolder(path: string, rootFolder: string): string | null {
 	const root = trimSlashes(rootFolder);
 	let relative = path;
 

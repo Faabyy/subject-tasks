@@ -1,21 +1,21 @@
 import type { ParsedTask } from '../parser/taskParser';
-import type { SubjectTasksSettings } from '../settings/settings';
-import { getSubject, isExcluded } from './subject';
+import type { TasksByFolderSettings } from '../settings/settings';
+import { getFolder, isExcluded } from './folder';
 import type { VaultTask } from './types';
 
 /**
- * Attaches path and subject to the tasks of one note.
+ * Attaches path and folder to the tasks of one note.
  * Returns no tasks for notes that are excluded or outside the root folder.
  */
 export function toVaultTasks(
 	path: string,
 	tasks: readonly ParsedTask[],
-	settings: Pick<SubjectTasksSettings, 'rootFolder' | 'excludedFolders'>,
+	settings: Pick<TasksByFolderSettings, 'rootFolder' | 'excludedFolders'>,
 ): VaultTask[] {
 	if (isExcluded(path, settings.excludedFolders)) return [];
 
-	const subject = getSubject(path, settings.rootFolder);
-	if (subject === null) return [];
+	const folder = getFolder(path, settings.rootFolder);
+	if (folder === null) return [];
 
-	return tasks.map((task) => ({ ...task, path, subject }));
+	return tasks.map((task) => ({ ...task, path, folder }));
 }

@@ -5,12 +5,12 @@ import { toVaultTasks } from './vaultTasks';
 const tasks = parseTasks('- [ ] One 📅 2026-10-20\n- [x] Two');
 
 describe('toVaultTasks', () => {
-	it('adds path and subject and keeps the parsed fields', () => {
+	it('adds path and folder and keeps the parsed fields', () => {
 		const result = toVaultTasks('Math/Algebra.md', tasks, { rootFolder: '', excludedFolders: [] });
 		expect(result).toHaveLength(2);
 		expect(result[0]).toMatchObject({
 			path: 'Math/Algebra.md',
-			subject: 'Math',
+			folder: 'Math',
 			line: 0,
 			text: 'One',
 			due: '2026-10-20',
@@ -27,9 +27,9 @@ describe('toVaultTasks', () => {
 		expect(toVaultTasks('Private/Diary.md', tasks, { rootFolder: 'School', excludedFolders: [] })).toEqual([]);
 	});
 
-	it('uses an empty subject for a note directly in the root', () => {
+	it('uses an empty folder for a note directly in the root', () => {
 		const result = toVaultTasks('Inbox.md', tasks, { rootFolder: '', excludedFolders: [] });
-		expect(result.every((t) => t.subject === '')).toBe(true);
+		expect(result.every((t) => t.folder === '')).toBe(true);
 	});
 
 	it('does not change the input tasks', () => {

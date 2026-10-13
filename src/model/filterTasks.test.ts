@@ -5,10 +5,10 @@ import { makeTask } from './testHelpers';
 const TODAY = '2026-10-13';
 const ALL = { query: '', onlyOverdue: false, showCompleted: true };
 
-const open = makeTask({ text: 'Read chapter', path: 'Deutsch/Book.md', subject: 'Deutsch' });
-const overdue = makeTask({ text: 'Hand in report', due: '2026-10-01', path: 'Mathe/Algebra.md', subject: 'Mathe' });
-const done = makeTask({ text: 'Finished item', status: 'done', statusChar: 'x', path: 'Mathe/Algebra.md', subject: 'Mathe' });
-const custom = makeTask({ text: 'In progress', status: 'other', statusChar: '/', path: 'Mathe/Algebra.md', subject: 'Mathe' });
+const open = makeTask({ text: 'Read chapter', path: 'Deutsch/Book.md', folder: 'Deutsch' });
+const overdue = makeTask({ text: 'Hand in report', due: '2026-10-01', path: 'Mathe/Algebra.md', folder: 'Mathe' });
+const done = makeTask({ text: 'Finished item', status: 'done', statusChar: 'x', path: 'Mathe/Algebra.md', folder: 'Mathe' });
+const custom = makeTask({ text: 'In progress', status: 'other', statusChar: '/', path: 'Mathe/Algebra.md', folder: 'Mathe' });
 const tasks = [open, overdue, done, custom];
 
 describe('filterTasks: completed tasks', () => {
@@ -43,7 +43,7 @@ describe('filterTasks: search', () => {
 		expect(filterTasks(tasks, { ...ALL, query: 'CHAPTER' }, TODAY)).toEqual([open]);
 	});
 
-	it('matches the note path, which includes the subject', () => {
+	it('matches the note path, which includes the folder', () => {
 		expect(filterTasks(tasks, { ...ALL, query: 'mathe' }, TODAY)).toEqual([overdue, done, custom]);
 		expect(filterTasks(tasks, { ...ALL, query: 'algebra.md' }, TODAY)).toEqual([overdue, done, custom]);
 	});

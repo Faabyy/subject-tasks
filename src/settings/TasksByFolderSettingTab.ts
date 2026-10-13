@@ -1,10 +1,10 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import type SubjectTasksPlugin from '../main';
+import type TasksByFolderPlugin from '../main';
 
-export class SubjectTasksSettingTab extends PluginSettingTab {
-	plugin: SubjectTasksPlugin;
+export class TasksByFolderSettingTab extends PluginSettingTab {
+	plugin: TasksByFolderPlugin;
 
-	constructor(app: App, plugin: SubjectTasksPlugin) {
+	constructor(app: App, plugin: TasksByFolderPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -18,11 +18,11 @@ export class SubjectTasksSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('Root folder')
 			.setDesc(
-				'Folder whose subfolders are the subjects. Leave empty to use the whole vault.',
+				'Tasks are grouped by the first folder below this one. Leave empty to use the whole vault.',
 			)
 			.addText((text) =>
 				text
-					.setPlaceholder('School')
+					.setPlaceholder('Projects')
 					.setValue(this.plugin.settings.rootFolder)
 					.onChange(async (value) => {
 						this.plugin.settings.rootFolder = value;

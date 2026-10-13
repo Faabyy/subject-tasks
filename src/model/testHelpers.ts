@@ -10,7 +10,7 @@ export function makeTask(overrides: Partial<VaultTask> = {}): VaultTask {
 		due: null,
 		raw: '- [ ] Task',
 		path: 'Math/a.md',
-		subject: 'Math',
+		folder: 'Math',
 		...overrides,
 	};
 }

@@ -33,7 +33,7 @@ function random() {
 const pick = (list) => list[Math.floor(random() * list.length)];
 const between = (min, max) => min + Math.floor(random() * (max - min + 1));
 
-const subjects = ['Mathe', 'Deutsch', 'Englisch', 'Informatik', 'Geschichte', 'Physik', 'Chemie', 'Biologie', 'Politik', 'Kunst', 'Sport', 'Religion'];
+const topFolders = ['Mathe', 'Deutsch', 'Englisch', 'Informatik', 'Geschichte', 'Physik', 'Chemie', 'Biologie', 'Politik', 'Kunst', 'Sport', 'Religion'];
 const topics = ['Grundlagen', 'Wiederholung', 'Hausaufgaben', 'Projekt', 'Klausur', 'Referat', 'Übung', 'Zusammenfassung'];
 const words = ['Aufgabe', 'Text', 'Kapitel', 'Formel', 'Notizen', 'Vokabeln', 'Skizze', 'Beispiel', 'Gedicht', 'Versuch'];
 
@@ -66,7 +66,7 @@ function note(index) {
 }
 
 for (let i = 0; i < count; i++) {
-	const folder = join(target, pick(subjects), pick(topics), ...(random() < 0.3 ? [`Woche ${between(1, 12)}`] : []));
+	const folder = join(target, pick(topFolders), pick(topics), ...(random() < 0.3 ? [`Woche ${between(1, 12)}`] : []));
 	const file = join(folder, `Notiz ${i}.md`);
 	mkdirSync(dirname(file), { recursive: true });
 	writeFileSync(file, note(i));

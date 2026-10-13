@@ -2,7 +2,7 @@ import { debounce, TFile } from 'obsidian';
 import type { CachedMetadata, Debouncer, Plugin, TAbstractFile } from 'obsidian';
 import type { VaultTask } from '../model/types';
 import { toVaultTasks } from '../model/vaultTasks';
-import type { SubjectTasksSettings } from '../settings/settings';
+import type { TasksByFolderSettings } from '../settings/settings';
 import { parseTasks } from '../parser/taskParser';
 import type { ParsedTask } from '../parser/taskParser';
 
@@ -50,7 +50,7 @@ function parseNote(content: string, cache: CachedMetadata | null): ParsedTask[] 
  */
 export class TaskIndex {
 	private readonly plugin: Plugin;
-	private readonly getSettings: () => SubjectTasksSettings;
+	private readonly getSettings: () => TasksByFolderSettings;
 
 	private tasksByPath = new Map<string, ParsedTask[]>();
 	private readonly listeners = new Set<() => void>();
@@ -60,7 +60,7 @@ export class TaskIndex {
 	private readonly touched = new Set<string>();
 	private building: Promise<IndexStats> | null = null;
 
-	constructor(plugin: Plugin, getSettings: () => SubjectTasksSettings) {
+	constructor(plugin: Plugin, getSettings: () => TasksByFolderSettings) {
 		this.plugin = plugin;
 		this.getSettings = getSettings;
 		this.notifyListeners = debounce(
@@ -153,7 +153,7 @@ export class TaskIndex {
 						const tasks = parseNote(content, metadataCache.getFileCache(file));
 						if (tasks.length > 0) fresh.set(file.path, tasks);
 					} catch (error) {
-						console.error(`Subject tasks: could not read ${file.path}`, error);
+						console.error(`Tasks by folder: could not read ${file.path}`, error);
 					}
 				}),
 			);
