@@ -25,17 +25,19 @@ export interface ParsedTask {
 /** A task line before its position in the file is known. */
 export type ParsedTaskLine = Omit<ParsedTask, 'line'>;
 
-// indent, list marker (- * +), then `[c]`, then whitespace or end of line.
+// indent, optional quote prefix (`>`, also nested and in callouts), list marker
+// (`-`, `*`, `+`, or a number with `.` or `)`), then `[c]`, then whitespace or end of line.
 // `- [ ]text` is not a task in Obsidian, so whitespace after `]` is required.
 // The `u` flag makes `.` match a whole emoji instead of half of it.
-const TASK_LINE = /^[ \t]*[-*+][ \t]+\[(.)\](?:[ \t]+(.*))?$/u;
+const TASK_LINE = /^[ \t]*(?:>[ \t]*)*(?:[-*+]|\d{1,9}[.)])[ \t]+\[(.)\](?:[ \t]+(.*))?$/u;
 
 // 📅, an optional emoji variation selector (U+FE0F), optional spaces, then a date.
 // `(?!\d)` stops `2026-10-200` from being read as `2026-10-20`.
 const DUE_TOKEN = /📅️?[ \t]*(\d{4})-(\d{2})-(\d{2})(?!\d)/gu;
 
 // A code fence opens with three or more backticks or tildes.
-const FENCE = /^[ \t]*(`{3,}|~{3,})(.*)$/;
+// It may sit inside a quote or callout, so the same quote prefix is allowed.
+const FENCE = /^[ \t]*(?:>[ \t]*)*(`{3,}|~{3,})(.*)$/;
 
 /** True if year, month and day form a real calendar date (rejects 2026-02-30). */
 function isRealDate(year: number, month: number, day: number): boolean {

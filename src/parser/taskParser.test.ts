@@ -51,7 +51,10 @@ describe('parseTaskLine: lines that are not tasks', () => {
 		['no space after the marker', '-[ ] Task'],
 		['two characters in the box', '- [xx] Task'],
 		['empty box', '- [] Task'],
-		['numbered list', '1. [ ] Task'],
+		['number without separator', '1 [ ] Task'],
+		['number without space after the dot', '1.[ ] Task'],
+		['number with ten digits', '1234567890. [ ] Task'],
+		['quote without a list marker', '> [ ] Task'],
 		['marker missing', '[ ] Task'],
 		['heading', '# [ ] Task'],
 		['link that looks like a box', '- [link](http://example.com)'],
@@ -71,6 +74,41 @@ describe('parseTaskLine: nesting and indentation', () => {
 
 	it('keeps the original line in raw, including indentation', () => {
 		expect(parseTaskLine('  * [x] Item')?.raw).toBe('  * [x] Item');
+	});
+});
+
+describe('parseTaskLine: numbered lists', () => {
+	it.each(['1.', '12.', '1)', '007.'])('accepts the marker %s', (marker) => {
+		expect(parseTaskLine(`${marker} [ ] Task`)?.text).toBe('Task');
+	});
+
+	it('reads status and due date', () => {
+		const task = parseTaskLine('3. [x] Task 📅 2026-10-20');
+		expect(task?.status).toBe('done');
+		expect(task?.due).toBe('2026-10-20');
+	});
+});
+
+describe('parseTaskLine: quotes and callouts', () => {
+	it.each(['> - [ ] Task', '>- [ ] Task', '>    - [ ] Task', '> > - [ ] Task', '>> - [ ] Task', '  > - [ ] Task'])(
+		'accepts %j',
+		(line) => {
+			expect(parseTaskLine(line)?.text).toBe('Task');
+		},
+	);
+
+	it('accepts a numbered task in a quote', () => {
+		expect(parseTaskLine('> 1. [ ] Task')?.text).toBe('Task');
+	});
+
+	it('keeps the quote prefix in raw', () => {
+		expect(parseTaskLine('> - [ ] Task')?.raw).toBe('> - [ ] Task');
+	});
+
+	it('reads status and due date', () => {
+		const task = parseTaskLine('> - [X] Task 📅 2026-10-20');
+		expect(task?.status).toBe('done');
+		expect(task?.due).toBe('2026-10-20');
 	});
 });
 
@@ -263,6 +301,22 @@ describe('parseTasks: code blocks', () => {
 	it('still finds a task line that only contains backticks in its text', () => {
 		const tasks = parseTasks('- [ ] Use ```code``` here');
 		expect(tasks).toHaveLength(1);
+	});
+});
+
+describe('parseTasks: callouts', () => {
+	it('finds tasks inside a callout', () => {
+		const tasks = parseTasks('> [!todo] Homework\n> - [ ] Read\n> - [x] Write\n\n- [ ] Outside');
+		expect(tasks.map((t) => [t.line, t.text])).toEqual([
+			[1, 'Read'],
+			[2, 'Write'],
+			[4, 'Outside'],
+		]);
+	});
+
+	it('ignores tasks in a code block inside a callout', () => {
+		const tasks = parseTasks('> ```\n> - [ ] In code\n> ```\n> - [ ] After');
+		expect(tasks.map((t) => t.text)).toEqual(['After']);
 	});
 });
 
