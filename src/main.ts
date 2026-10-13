@@ -2,6 +2,7 @@ import { Notice, Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, SubjectTasksSettings } from './settings/settings';
 import { SubjectTasksSettingTab } from './settings/SubjectTasksSettingTab';
 import { TaskIndex } from './vault/taskIndex';
+import { SubjectTasksView, VIEW_TYPE_SUBJECT_TASKS } from './view/SubjectTasksView';
 
 export default class SubjectTasksPlugin extends Plugin {
 	settings!: SubjectTasksSettings;
@@ -14,12 +15,33 @@ export default class SubjectTasksPlugin extends Plugin {
 		this.index = new TaskIndex(this, () => this.settings);
 		this.index.start();
 
+		this.registerView(
+			VIEW_TYPE_SUBJECT_TASKS,
+			(leaf) => new SubjectTasksView(leaf, this.index, () => this.settings),
+		);
+
+		this.addCommand({
+			id: 'open-view',
+			name: 'Open view',
+			callback: () => {
+				void this.openView();
+			},
+		});
+
 		this.addCommand({
 			id: 'refresh',
 			name: 'Refresh task index',
 			callback: () => {
 				void this.refreshIndex();
 			},
+		});
+	}
+
+	/** Shows the view in the right sidebar, or brings it to the front if it is already open. */
+	private async openView() {
+		await this.app.workspace.ensureSideLeaf(VIEW_TYPE_SUBJECT_TASKS, 'right', {
+			active: true,
+			reveal: true,
 		});
 	}
 
