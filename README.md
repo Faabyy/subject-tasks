@@ -109,13 +109,15 @@ This comparison is based on the other plugins' documentation pages, not on long-
 
 ## Development
 
-Node.js 20.19 or newer is recommended (a lint dependency asks for it). Build and tests also ran on Node 18.
+Node.js 22.12 or newer is needed for the tests (Vitest 5 requires it). Building the plugin works on older versions too.
 
 ```
 npm install
 npm run dev     # builds main.js and rebuilds on every change
 npm run build   # type check and production build
 npm test        # unit tests (Vitest)
+npm run test:coverage  # unit tests with a coverage report
+npm run typecheck      # TypeScript only, strict
 npm run lint    # ESLint with the Obsidian plugin rules
 ```
 
@@ -136,6 +138,12 @@ test-vault-samples/  invented notes for trying the plugin in a test vault
 ```
 
 Reading the whole vault is fast: in a generated vault of 2000 notes (about 5500 tasks), *Refresh task index* takes around 20 ms in Obsidian on a desktop PC. Generate your own with `node scripts/generate-vault.mjs <empty folder> 2000`.
+
+## Quality
+
+- **Strict TypeScript** (`strict`, plus unused code, `override`, exact optional properties and more) and ESLint with the Obsidian plugin rules. The type check and ESLint run in CI on every push.
+- **Unit tests** cover the parser, subjects, sorting, grouping, filtering, the ticking logic and the settings cleanup. These pure modules have 100% line coverage and about 96% branch coverage, and The test run fails if they drop (see `vitest.config.mjs`). `npm run test:coverage` shows the current numbers.
+- **The code that talks to Obsidian** (the view, the index, the settings tab) is not unit tested; counted over all of `src` the line coverage is about 36%. It is checked by hand with [docs/manual-test-checklist.md](docs/manual-test-checklist.md). The checklist also says what has been tested so far: Obsidian 1.14.4 on desktop. Not tested yet: mobile, and Obsidian versions before 1.13.
 
 ## Privacy
 

@@ -57,11 +57,11 @@ export class TasksByFolderView extends ItemView {
 		return 'Tasks by folder';
 	}
 
-	getIcon(): string {
+	override getIcon(): string {
 		return 'list-checks';
 	}
 
-	async onOpen(): Promise<void> {
+	override async onOpen(): Promise<void> {
 		const root = this.contentEl;
 		root.empty();
 		root.addClass('tasks-by-folder-view');

@@ -6,10 +6,10 @@ import { TaskIndex } from './vault/taskIndex';
 import { TasksByFolderView, VIEW_TYPE_TASKS_BY_FOLDER } from './view/TasksByFolderView';
 
 export default class TasksByFolderPlugin extends Plugin {
-	settings!: TasksByFolderSettings;
+	override settings!: TasksByFolderSettings;
 	index!: TaskIndex;
 
-	async onload() {
+	override async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new TasksByFolderSettingTab(this.app, this));
 

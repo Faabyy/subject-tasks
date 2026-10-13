@@ -29,7 +29,7 @@ export class TasksByFolderSettingTab extends PluginSettingTab {
 
 	// ---- Obsidian 1.13 and newer ----
 
-	getSettingDefinitions(): SettingDefinitionItem[] {
+	override getSettingDefinitions(): SettingDefinitionItem[] {
 		return [
 			{
 				name: 'Root folder',
@@ -60,7 +60,7 @@ export class TasksByFolderSettingTab extends PluginSettingTab {
 		];
 	}
 
-	getControlValue(key: string): unknown {
+	override getControlValue(key: string): unknown {
 		switch (key) {
 			case ROOT_FOLDER:
 				return this.plugin.settings.rootFolder;
@@ -73,13 +73,13 @@ export class TasksByFolderSettingTab extends PluginSettingTab {
 		}
 	}
 
-	async setControlValue(key: string, value: unknown): Promise<void> {
+	override async setControlValue(key: string, value: unknown): Promise<void> {
 		await this.applyValue(key, value);
 	}
 
 	// ---- Obsidian before 1.13 ----
 
-	display(): void {
+	override display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
 
