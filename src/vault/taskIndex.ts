@@ -113,6 +113,11 @@ export class TaskIndex {
 		};
 	}
 
+	/** Tells the listeners (debounced) that something besides the notes changed, such as a setting. */
+	notifyChanged(): void {
+		this.notifyListeners();
+	}
+
 	/** All tasks of notes that are inside the root folder and not excluded, in no particular order. */
 	getTasks(): VaultTask[] {
 		const settings = this.getSettings();

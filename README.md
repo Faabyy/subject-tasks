@@ -5,8 +5,8 @@ An [Obsidian](https://obsidian.md) plugin that shows the open tasks of your whol
 Open tasks (`- [ ]`) tend to end up scattered over dozens of notes. This plugin collects them in one place, grouped by the folder they live in, so you can see what is due without opening every note. I first built it for my school notes, with one folder per subject. It works for any folder structure: courses, projects, clients, areas of life.
 
 > **Status: work in progress (version 0.1.0, not released yet).**
-> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, ticking tasks, and the commands below.
-> Not built yet: a full settings screen (see [Settings](#settings)).
+> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, ticking tasks, the settings and the commands below.
+> Not done yet: testing on mobile, and the release itself.
 
 <p align="center">
   <img src="docs/view.png" width="280" alt="The Tasks by folder sidebar view: tasks grouped by folder (Archiv, Deutsch, Englisch, Informatik, Mathe), each with its due date and note name, an overdue date in red, a search field and an Overdue only switch.">
@@ -72,7 +72,9 @@ By default only open tasks are shown. Done tasks and tasks with a custom status 
 | Excluded folders | none | Notes in these folders are ignored. |
 | Show completed tasks | off | Also list done tasks and tasks with a custom status. |
 
-At the moment the settings screen offers only the root folder. *Excluded folders* and *Show completed tasks* are already stored in the plugin's `data.json` but get their settings controls in a later version.
+Changes apply right away, and the list redraws. Paths are cleaned up when you type them (backslashes, leading and trailing slashes, spaces around parts), and a path that cannot be a folder inside the vault, such as one with `..` or a `:`, is rejected with a message instead of being saved. If the root folder does not exist, the list says so instead of just being empty. A settings file that is missing, damaged or edited by hand never stops the plugin from starting: every invalid value falls back to its default.
+
+The settings screen uses Obsidian's search-friendly settings on version 1.13 and newer, and a classic settings page on older versions.
 
 ## Installation
 

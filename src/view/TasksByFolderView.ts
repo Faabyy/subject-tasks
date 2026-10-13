@@ -118,10 +118,12 @@ export class TasksByFolderView extends ItemView {
 
 		if (tasks.length === 0) {
 			const filtered = this.query.trim() !== '' || this.onlyOverdue;
-			this.listEl.createDiv({
-				cls: 'tasks-by-folder-empty',
-				text: filtered ? 'No tasks match the filter.' : 'No open tasks.',
-			});
+			const rootMissing = settings.rootFolder !== '' && !this.app.vault.getFolderByPath(settings.rootFolder);
+
+			let message = filtered ? 'No tasks match the filter.' : 'No open tasks.';
+			if (rootMissing) message = `The root folder "${settings.rootFolder}" does not exist. Check the plugin settings.`;
+
+			this.listEl.createDiv({ cls: 'tasks-by-folder-empty', text: message });
 			return;
 		}
 

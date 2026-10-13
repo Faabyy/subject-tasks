@@ -91,3 +91,7 @@
 	color: var(--text-faint);
 	text-decoration: line-through;
 }
+
+.tasks-by-folder-setting-error {
+	color: var(--text-error);
+}

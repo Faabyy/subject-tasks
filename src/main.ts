@@ -1,5 +1,6 @@
 import { Notice, Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, TasksByFolderSettings } from './settings/settings';
+import { normalizeSettings } from './settings/normalizeSettings';
+import type { TasksByFolderSettings } from './settings/settings';
 import { TasksByFolderSettingTab } from './settings/TasksByFolderSettingTab';
 import { TaskIndex } from './vault/taskIndex';
 import { TasksByFolderView, VIEW_TYPE_TASKS_BY_FOLDER } from './view/TasksByFolderView';
@@ -53,14 +54,13 @@ export default class TasksByFolderPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<TasksByFolderSettings>,
-		);
+		// The file may be missing, edited by hand or damaged; normalizeSettings never throws.
+		this.settings = normalizeSettings(await this.loadData());
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		// The list depends on the settings, so the view has to redraw.
+		this.index.notifyChanged();
 	}
 }
