@@ -59,7 +59,8 @@ function note(index) {
 	const taskCount = random() < 0.33 ? 0 : between(1, 8);
 	for (let i = 0; i < between(2, 12); i++) lines.push(`${pick(words)} ${pick(words).toLowerCase()} ${between(1, 999)}. Ein Satz zum Auffüllen der Notiz.`);
 	lines.push('');
-	for (let i = 0; i < taskCount; i++) lines.push(taskLine(random() < 0.25 ? 1 : 0));
+	// A task indented by 4 spaces is only a nested task below another task; at the start of a list it would be an indented code block.
+	for (let i = 0; i < taskCount; i++) lines.push(taskLine(i > 0 && random() < 0.25 ? 1 : 0));
 	if (random() < 0.1) lines.push('', '```md', '- [ ] Aufgabe im Codeblock', '```');
 	return lines.join('\n') + '\n';
 }
