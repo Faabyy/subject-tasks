@@ -147,3 +147,7 @@ Tasks by folder reads the Markdown notes in your vault to find tasks. It makes n
 ## License
 
 [MIT](LICENSE).
+
+---
+
+Co-Authored-By: Claude Code
