@@ -142,7 +142,7 @@ Reading the whole vault is fast: in a generated vault of 2000 notes (about 5500 
 ## Quality
 
 - **Strict TypeScript** (`strict`, plus unused code, `override`, exact optional properties and more) and ESLint with the Obsidian plugin rules. The type check and ESLint run in CI on every push.
-- **Unit tests** cover the parser, subjects, sorting, grouping, filtering, the ticking logic and the settings cleanup. These pure modules have 100% line coverage and about 96% branch coverage, and The test run fails if they drop (see `vitest.config.mjs`). `npm run test:coverage` shows the current numbers.
+- **Unit tests** cover the parser, folders, sorting, grouping, filtering, the ticking logic and the settings cleanup. These pure modules have 100% line coverage and about 96% branch coverage, and the test run fails if they drop (see `vitest.config.mjs`). `npm run test:coverage` shows the current numbers.
 - **The code that talks to Obsidian** (the view, the index, the settings tab) is not unit tested; counted over all of `src` the line coverage is about 36%. It is checked by hand with [docs/manual-test-checklist.md](docs/manual-test-checklist.md). The checklist also says what has been tested so far: Obsidian 1.14.4 on desktop. Not tested yet: mobile, and Obsidian versions before 1.13.
 
 ## Privacy
@@ -151,4 +151,4 @@ Tasks by folder reads the Markdown notes in your vault to find tasks. It makes n
 
 ## License
 
-See [LICENSE](LICENSE).
+[MIT](LICENSE).
