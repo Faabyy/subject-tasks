@@ -1,7 +1,7 @@
 {
 	"id": "tasks-by-folder",
 	"name": "Tasks by folder",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"minAppVersion": "1.7.2",
 	"description": "Shows open tasks from across your vault in one sidebar view, grouped by folder and sorted by due date.",
 	"author": "Faabyy",

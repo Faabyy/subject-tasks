@@ -4,9 +4,7 @@ An [Obsidian](https://obsidian.md) plugin that shows the open tasks of your whol
 
 Open tasks (`- [ ]`) tend to end up scattered over dozens of notes. This plugin collects them in one place, grouped by the folder they live in, so you can see what is due without opening every note. I first built it for my school notes, with one folder per subject. It works for any folder structure: courses, projects, clients, areas of life.
 
-> **Status: work in progress (version 0.1.0, not released yet).**
-> Working today: the sidebar view, grouping, sorting, filters, jumping to the task, ticking tasks, the settings and the commands below.
-> Not done yet: testing on mobile, and the release itself.
+> **Not tested on mobile yet.** The plugin uses no Node or Electron APIs and is built to work on mobile, but I have only tested it on desktop (Obsidian 1.14.4).
 
 ## What it does
 
@@ -74,14 +72,15 @@ The settings screen uses Obsidian's search-friendly settings on version 1.13 and
 
 ## Installation
 
-The plugin is not in the community plugin directory yet. To try it, build it yourself:
+The plugin is not in the community plugin directory yet. Until it is, install a release by hand:
 
-1. Close Obsidian's restricted mode (*Settings → Community plugins*).
-2. Clone this repository into `<your vault>/.obsidian/plugins/tasks-by-folder`. The folder name must be `tasks-by-folder`.
-3. Run `npm install` and `npm run build` in that folder.
-4. Enable *Tasks by folder* under *Settings → Community plugins*.
+1. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/Faabyy/tasks-by-folder/releases/latest).
+2. Put the three files in `<your vault>/.obsidian/plugins/tasks-by-folder/`. The folder name must be `tasks-by-folder`.
+3. Turn off restricted mode (*Settings → Community plugins*) and enable *Tasks by folder*.
 
-It needs Obsidian **1.7.2** or newer. It uses no Node or Electron APIs and is built to work on mobile, but I have not tested it there yet.
+To build it yourself instead, clone this repository into that folder and run `npm install` and `npm run build` there.
+
+It needs Obsidian **1.7.2** or newer. It uses no Node or Electron APIs and is built to work on mobile, but I have not tested it there.
 
 Try it in a separate test vault first, not in your real notes. The folder `test-vault-samples/` contains invented notes with the edge cases this plugin handles.
 
