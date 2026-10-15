@@ -8,10 +8,6 @@ Open tasks (`- [ ]`) tend to end up scattered over dozens of notes. This plugin 
 > Working today: the sidebar view, grouping, sorting, filters, jumping to the task, ticking tasks, the settings and the commands below.
 > Not done yet: testing on mobile, and the release itself.
 
-<p align="center">
-  <img src="docs/view.png" width="280" alt="The Tasks by folder sidebar view: tasks grouped by folder (Archiv, Deutsch, Englisch, Informatik, Mathe), each with its due date and note name, an overdue date in red, a search field and an Overdue only switch.">
-</p>
-
 ## What it does
 
 - **One list for the whole vault.** Open the view from the command palette and see every open task.
